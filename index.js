@@ -3,7 +3,7 @@ const clr = require('clr-js');
 
 const s = ["┏","━","┳","┓","┃","┣","╋","┫","┗","┻","┛"]
 
-const init_grid_text = fs.readFileSync("grid4.txt").toString()
+const init_grid_text = fs.readFileSync("grid99.txt").toString()
 let init_grid = []
 init_grid_text.split("\n").forEach(element => {
     l = []
@@ -98,7 +98,7 @@ const pen_start = (grid) => {
 
 
 const fill_when_one = (grid) => {
-    n = 0
+    let n = 0
     for (let y = 0; y < grid.length; y++) {
         for (let x = 0; x < grid[y].length; x++) {
             const element = grid[y][x];
@@ -170,7 +170,6 @@ const seule_de_care = (grid) => {
                     }
                 }
             }
-            console.log(l)
             for (let i = 0; i < 3; i++) {
                 for (let j = 0; j < 3; j++) {
                     let xx = square_line*3+i
@@ -197,10 +196,18 @@ const seule_de_care = (grid) => {
 display_sudoku(init_grid)
 pen_start(init_grid)
 let i = 0
-while (i<30) {
+while (fill_when_one(init_grid)) {
     i++
-    console.log(i)
-    fill_when_one(init_grid)
-    seule_de_care(init_grid)
+    console.log("i:",i)
+    display_sudoku(init_grid)
+}
+let n = 0
+let c = 1
+while (c > 0) {
+    c = 0
+    n++
+    console.log("n:",n)
+    c =  seule_de_care(init_grid)
+    c += fill_when_one(init_grid)
     display_sudoku(init_grid)
 }
