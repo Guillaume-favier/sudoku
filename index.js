@@ -1,8 +1,9 @@
 const fs = require("fs");
+const clr = require('clr-js');
 
 const s = ["┏","━","┳","┓","┃","┣","╋","┫","┗","┻","┛"]
 
-const init_grid_text = fs.readFileSync("grid3.txt").toString()
+const init_grid_text = fs.readFileSync("grid4.txt").toString()
 let init_grid = []
 init_grid_text.split("\n").forEach(element => {
     l = []
@@ -23,7 +24,8 @@ const pre_disp = (l,s,long) => {
             res.push(" ")
             return
         }
-        res.push(element[0].toString())
+        if (element[1].length == 0) res.push(clr.bold(element[0].toString()).it())
+        else res.push(clr.blue(element[0].toString()).it())
     });
     return res.join(" ")
 }
@@ -142,16 +144,63 @@ const enleve_poss = (grid,x,y,v) => {
 
 }
 
+const combine = (l1,l2) => {
+    r = [0,0,0,0,0,0,0,0,0]
+    for (let i = 0; i < 9; i++) {
+        if (l1[i] == -1 || l2[i] == -1) {r[i] == -1; continue}
+        r[i] = l1[i] + l2[i]
+    }
+    return r
+}
 
-console.log(1)
+
+const seule_de_care = (grid) => {
+    let n = 0
+    for (let square_col = 0; square_col < 3; square_col++) {
+        for (let square_line = 0; square_line < 3; square_line++) {
+        
+            l = [0,0,0,0,0,0,0,0,0]
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    const element = grid[square_line*3+i][square_col*3+j];
+                    if (element[0] == 0) {
+                        l = combine(l,element[1])
+                    }else{
+                        l[element[0]-1] = -1
+                    }
+                }
+            }
+            console.log(l)
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    let xx = square_line*3+i
+                    let yy = square_col*3+j
+                    const element = grid[xx][yy];
+                    if (element[0] == 0) {
+                        element[1].forEach((e,k) => {
+                            if(e == 1 && l[k] == 1){
+                                console.log("x:",xx, "y:",yy, "k+1:",k+1)
+                                grid[xx][yy][0] = k+1
+                                enleve_poss(grid,yy,xx,k+1)
+                                n++
+                            }
+                        })
+                    }
+                }
+            }
+        }
+    }
+    return n!=0
+}
+
+
 display_sudoku(init_grid)
 pen_start(init_grid)
 let i = 0
-while (fill_when_one(init_grid)) {
+while (i<30) {
     i++
     console.log(i)
+    fill_when_one(init_grid)
+    seule_de_care(init_grid)
     display_sudoku(init_grid)
 }
-
-//TODO:
-// si une case est remplie, il faut enlever les possibilités dans les cases du même groupe, de la même ligne et de la même colonne
